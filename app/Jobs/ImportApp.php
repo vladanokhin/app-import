@@ -11,19 +11,22 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ImportApp implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected FileUpload $file;
+    protected int $fileId;
+    protected JsonData $jsonData;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(FileUpload $file)
+    public function __construct(int $fileId, JsonData $jsonData)
     {
-        $this->file = $file;
+        $this->fileId = $fileId;
+        $this->jsonData = $jsonData;
     }
 
     /**
@@ -33,7 +36,7 @@ class ImportApp implements ShouldQueue, ShouldBeUnique
      */
     public function uniqueId()
     {
-        return $this->file->id;
+        return $this->fileId;
     }
 
     /**
@@ -41,10 +44,9 @@ class ImportApp implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        $jsonData = new JsonData($this->file->path);
         $api = new StackDeckApi();
 
-        foreach ($jsonData->getData() as $app) {
+        foreach ($this->jsonData->getData() as $app) {
             $api->createApp($app);
         }
     }
