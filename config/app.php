@@ -188,5 +188,7 @@ return [
     /**
      * All files that will be stored more than the specified number will be deleted
      */
-    'number_of_months_of_files_storage' => (int) env('NUMBER_OF_MONTHS_OF_FILES_STORAGE', 3)
+    'number_of_months_of_files_storage' => (int) env('NUMBER_OF_MONTHS_OF_FILES_STORAGE', 3),
+
+    'stack_deck_token' => env('STACK_DECK_TOKEN'),
 ];
