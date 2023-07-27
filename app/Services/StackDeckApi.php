@@ -28,7 +28,9 @@ class StackDeckApi
         $response = $this->client->post(self::URL, $data);
 
         if($response->failed())
-            Log::error('StackDeckApi cannot create app: ' . $response->json());
+            Log::error('StackDeckApi cannot create app: ' . $response->body());
+        else
+            Log::info($data['uuid'] . ' | Successful created app');
     }
 }
 

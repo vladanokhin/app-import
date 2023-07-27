@@ -78,7 +78,7 @@ class UploadFileTest extends TestCase
         $response = $this->postJson('/api/file/store', [
             'file' => UploadedFile::fake()
                                     ->create('data.json')
-                                    ->size(3000),
+                                    ->size(6550),
         ]);
 
         $response

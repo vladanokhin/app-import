@@ -22,7 +22,7 @@ class FileUploadStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|file|mimes:json|max:2048'
+            'file' => 'required|file|mimes:json|max:5550'
         ];
     }
 }

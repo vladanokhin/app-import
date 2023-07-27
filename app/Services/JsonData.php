@@ -11,7 +11,7 @@ class JsonData
 {
     protected array $content;
     const IMAGE_URL = 'https://images.crunchbase.com/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/';
-    const REQUIRED_KEYS = ['category_id', 'properties.identifier.value'];
+    const REQUIRED_KEYS = ['uuid', 'properties.identifier.value'];
 
     /**
      * @param string $path path to file with json data
