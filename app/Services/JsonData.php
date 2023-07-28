@@ -11,7 +11,7 @@ class JsonData
 {
     protected array $content;
     const IMAGE_URL = 'https://images.crunchbase.com/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/';
-    const REQUIRED_KEYS = ['uuid', 'properties.identifier.value'];
+    const REQUIRED_KEYS = ['properties.identifier.value', 'properties.sso_remarks'];
 
     /**
      * @param string $path path to file with json data
@@ -44,8 +44,10 @@ class JsonData
     {
         foreach ($this->content['entities'] as $app) {
 
-            if(!Arr::has($app, self::REQUIRED_KEYS)) {
-                Log::warning($app['uuid'] . " | Cannot find 'category_id' or 'name' field");
+            if(!Arr::has($app, self::REQUIRED_KEYS)
+                || $this->isEmptyValues($app, self::REQUIRED_KEYS))
+            {
+                Log::warning($app['uuid'] . " | Cannot find one of required keys field: " . Arr::join(self::REQUIRED_KEYS, ', '));
                 continue;
             }
 
@@ -58,10 +60,10 @@ class JsonData
      * @param array $app
      * @return array
      */
-    private function createArrayData(array $app)
+    private function createArrayData(array $app): array
     {
         return [
-            'category_id' => $app['uuid'],
+            'category_id' => '41834f5c-5d72-4757-8d80-2741da19bac8',
             'name' => Arr::get($app, 'properties.identifier.value'),
             'description' => Arr::get($app, 'properties.short_description'),
             'website' => 'https://stackdeck.com',
@@ -123,5 +125,22 @@ class JsonData
         return is_null($date)
             ? $default
             : date('Y', strtotime($date));
+    }
+
+    /**
+     * Check if the received value is a string and not empty
+     * @param array $array
+     * @param string $key
+     * @return bool
+     */
+    private function isEmptyValues(array $array, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            $value = Arr::get($array, $key, '');
+            if(is_string($value) && strlen($value) === 0)
+                return true;
+        }
+
+        return false;
     }
 }

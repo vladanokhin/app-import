@@ -28,9 +28,9 @@ class StackDeckApi
         $response = $this->client->post(self::URL, $data);
 
         if($response->failed())
-            Log::error('StackDeckApi cannot create app:', ['app' => $data['category_id'], 'response' => $response->json()]);
+            Log::error('StackDeckApi cannot create app:', ['app' => $data['crunchbase_id'], 'response' => $response->json()]);
         else
-            Log::info('Successful created app', ['app' => $data['category_id']]);
+            Log::info('Successful created app', ['app' => $data['crunchbase_id']]);
     }
 }
 
