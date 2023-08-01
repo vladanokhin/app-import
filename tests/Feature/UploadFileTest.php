@@ -84,6 +84,6 @@ class UploadFileTest extends TestCase
         $response
             ->assertStatus(422)
             ->assertJsonValidationErrors('file')
-            ->assertJsonPath('errors.file.0', 'The file field must not be greater than 2048 kilobytes.');
+            ->assertJsonPath('errors.file.0', 'The file field must not be greater than 5550 kilobytes.');
     }
 }

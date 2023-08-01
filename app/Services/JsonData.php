@@ -11,7 +11,7 @@ class JsonData
 {
     protected array $content;
     const IMAGE_URL = 'https://images.crunchbase.com/c_lpad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/';
-    const REQUIRED_KEYS = ['properties.identifier.value', 'properties.sso_remarks'];
+    const REQUIRED_KEYS = ['properties.identifier.value'];
 
     /**
      * @param string $path path to file with json data
@@ -45,7 +45,7 @@ class JsonData
         foreach ($this->content['entities'] as $app) {
 
             if(!Arr::has($app, self::REQUIRED_KEYS)
-                || $this->isEmptyValues($app, self::REQUIRED_KEYS))
+                    || $this->isEmptyValues($app, self::REQUIRED_KEYS))
             {
                 Log::warning($app['uuid'] . " | Cannot find one of required keys field: " . Arr::join(self::REQUIRED_KEYS, ', '));
                 continue;
@@ -62,11 +62,11 @@ class JsonData
      */
     private function createArrayData(array $app): array
     {
-        return [
+        $data = [
             'category_id' => '41834f5c-5d72-4757-8d80-2741da19bac8',
             'name' => Arr::get($app, 'properties.identifier.value'),
             'description' => Arr::get($app, 'properties.short_description'),
-            'website' => 'https://stackdeck.com',
+            'website' => Arr::get($app, 'properties.website.value'),
             'icon' => $this->createIconField(
                 Arr::get($app, 'properties.identifier.image_id')
             ),
@@ -77,11 +77,20 @@ class JsonData
             'supports_sso' => Arr::get($app, 'properties.support_sso'),
             'sso_remarks' =>  Arr::get($app, 'properties.sso_remarks'),
             'founded_year' => $this->getYear(
-                Arr::get($app,'properties.founded_on.value')
+                Arr::get($app,'properties.founded_on.value'),
+
             ),
-            'urls' => Arr::get($app, 'properties.app_urls', []),
+            'urls' => Arr::get($app, 'properties.app_urls'),
             'crunchbase_id' => Arr::get($app, 'properties.identifier.uuid'),
         ];
+
+        return Arr::where($data, function ($value, $key) {
+            return  is_string($value) && strlen($value) > 0
+                    || is_array($value)
+                    && !$this->isEmptyValues($value, array_keys($value))
+                    && count($value) > 0
+                    || is_bool($value);
+        });
     }
 
     /**
@@ -103,7 +112,7 @@ class JsonData
      * @param mixed $default
      * @return mixed
      */
-    private function createLocationField(null|array $data, mixed $default = ''): mixed
+    private function createLocationField(null|array $data, mixed $default = null): mixed
     {
         if(is_null($data) || count($data) === 0)
             return $default;
@@ -130,7 +139,7 @@ class JsonData
     /**
      * Check if the received value is a string and not empty
      * @param array $array
-     * @param string $key
+     * @param array $keys
      * @return bool
      */
     private function isEmptyValues(array $array, array $keys): bool
